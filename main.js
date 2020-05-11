@@ -1,6 +1,9 @@
 const { app, BrowserWindow } = require('electron');
+const fs = require('fs');
 
 function createWindow() {
+
+  fs.writeFileSync('badge.html', '<html><head><title>Electron window</title></head><body><h1>Hallo ik ben een badge</h1></body></html>');
 
   let win = new BrowserWindow({
     width: 800,
@@ -9,25 +12,20 @@ function createWindow() {
       nodeIntegration: true
     }
   })
-
-  win.loadFile('index.html');
-
-  let printer = win.webContents.getPrinters().filter(p => p.name === "Microsoft Print to PDF");
   
-  console.log(printer);
-  console.log(printer[0].name);
-
+  win.loadFile('badge.html');
+  let printer = win.webContents.getPrinters().filter(p => p.name === "Microsoft Print to PDF");
 
   const printOptions = {
     silent: true,
     // deviceName: 'Microsoft Print to PDF'
-    // deviceName: 'NPIF05A66 (HP Color LaserJet MFP M281fdw)'
-    deviceName: printer[0].name
-    // deviceName: ""
+    deviceName: "" // Takes your pc's default printer. This is also the default behavior. 
   }
 
-  win.webContents.print(printOptions, succes => {
-    console.log("printen is geslaagd");
+  win.webContents.on('dom-ready', (event) => {
+    win.webContents.print(printOptions, succes => {
+      console.log("printen is geslaagd");
+    })
   })
 }
 
